@@ -1,8 +1,9 @@
 # goframe基础开发框架
 
-开发框架基于GIN框架，数据库操作依赖 GORM 开源包,开发之前需要掌握GO基本的语法知识。
+开发框架基于GIN框架，数据库操作依赖 GORM 开源包。
 
-GIN框架文档地址：[https://gin-gonic.com/zh-cn/docs/introduction/](https://gin-gonic.com/zh-cn/docs/introduction/)
+GIN框架文档地址：
+[https://gin-gonic.com/zh-cn/docs/introduction/](https://gin-gonic.com/zh-cn/docs/introduction/)
 
 GORM文档地址：
 [https://gorm.io/zh\_CN/docs/index.html](https://gorm.io/zh_CN/docs/index.html)
