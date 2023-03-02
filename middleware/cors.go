@@ -39,7 +39,7 @@ func init() {
 	}
 }
 
-func Cors() gin.HandlerFunc {
+func CorsHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		conf := CorsOptions{}
 		if f, err := os.ReadFile(funcs.GetRootPath() + "/configs/cors.yml"); err != nil {

@@ -4,9 +4,7 @@ package middleware
 import (
 	"time"
 
-	"github.com/perpower/goframe/funcs"
-	"github.com/perpower/goframe/pconstants"
-	"github.com/perpower/goframe/structs"
+	"github.com/perpower/goframe/utils/errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
@@ -20,7 +18,7 @@ const (
 
 // fillInterval: 令牌填充间隔
 // cap: 令牌桶容量
-func RateLimiter(fillInterval time.Duration, cap int64) gin.HandlerFunc {
+func RateLimiterHandle(fillInterval time.Duration, cap int64) gin.HandlerFunc {
 	if cap < 1 {
 		cap = Capacity
 	}
@@ -29,11 +27,8 @@ func RateLimiter(fillInterval time.Duration, cap int64) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 如果取不到令牌就中断本次请求返回系统繁忙提示
 		if bucket.TakeAvailable(1) < 1 {
-			funcs.OutJson(c, structs.Outjson{
-				Code: pconstants.ERROR_3054,
-				Msg:  "系统繁忙,请稍后再试",
-			})
 			c.Abort()
+			c.Error(&errors.ERROR_3054)
 			return
 		}
 		c.Next()

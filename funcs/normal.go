@@ -2,54 +2,13 @@ package funcs
 
 import (
 	"bytes"
-	"net/http"
 	"reflect"
 	"sort"
 	"strings"
 	"unsafe"
 
-	"github.com/perpower/goframe/pconstants"
-	"github.com/perpower/goframe/structs"
-
-	"github.com/gin-gonic/gin"
 	"github.com/thinkeridea/go-extend/exunicode/exutf8"
 )
-
-// 定义api接口统一输出json格式内容的方法
-// obj：结构体
-func OutJson(c *gin.Context, obj structs.Outjson) {
-	emptyMap := struct{}{}
-	jsonContent := reflect.TypeOf(obj)
-	if _, ok := jsonContent.FieldByName("Code"); ok {
-		//检测是否传值了Msg字段
-		if _, ok := jsonContent.FieldByName("Msg"); ok {
-			if obj.Msg == "" {
-				obj.Msg = pconstants.Jsoncode[obj.Code]
-			}
-		} else {
-			obj.Msg = pconstants.Jsoncode[obj.Code]
-		}
-
-		//检测是否传值了Data字段
-		if _, ok := jsonContent.FieldByName("Data"); ok {
-			if obj.Data == nil || obj.Data == "" {
-				obj.Data = emptyMap
-			}
-		} else {
-			obj.Data = emptyMap
-		}
-
-		c.JSON(http.StatusOK, obj)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"code": pconstants.ERROR_CODE,
-		"msg":  "内部服务异常",
-		"data": emptyMap,
-	})
-	c.Abort()
-}
 
 // 对集合按字母顺序排序
 func SortMap(params map[string]any) map[string]any {

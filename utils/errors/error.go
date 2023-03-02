@@ -1,88 +1,105 @@
-// 错误处理
+// 统一错误处理
+// Author: syswen
 package errors
 
-import (
-	"fmt"
+import "fmt"
 
-	"github.com/perpower/goframe/utils/pcode"
+// 定义错误返回结构体
+type OutError struct {
+	Code int         // 错误码
+	Msg  string      // 错误信息
+	Data interface{} // 返回数据
+}
+
+var (
+	SUCCESS_CODE = OutError{0, "success", nil}
+	ERROR_CODE   = OutError{-1, "failed", nil}
+	ERROR_1001   = OutError{1001, "签名失效", nil}
+	ERROR_1002   = OutError{1002, "签名错误", nil}
+	ERROR_2001   = OutError{2001, "数据记录不存在", nil}
+	ERROR_2002   = OutError{2002, "数据重复", nil}
+	ERROR_2003   = OutError{2003, "创建/更新数据失败", nil}
+	ERROR_3000   = OutError{3000, "参数验证不通过", nil}
+	ERROR_3001   = OutError{3001, "操作过于频繁请稍后再试", nil}
+	ERROR_3002   = OutError{3002, "无操作权限", nil}
+	ERROR_3003   = OutError{3003, "上传失败", nil}
+	ERROR_3004   = OutError{3004, "数据格式不正确", nil}
+	ERROR_3005   = OutError{3005, "提交的数据不符合字典约束范围值", nil}
+	ERROR_3006   = OutError{3006, "提交的数据校验不通过，验证失败", nil}
+	ERROR_3054   = OutError{3054, "系统繁忙,请稍后再试", nil}
+	ERROR_4001   = OutError{4001, "未授权", nil}
+	ERROR_4002   = OutError{4002, "未知错误", nil}
+	ERROR_4004   = OutError{4002, "页面未定义", nil}
+	ERROR_5000   = OutError{5000, "服务器异常", nil}
+	ERROR_9000   = OutError{9000, "账户授权Token值已过期请重新获取", nil}
+	ERROR_9001   = OutError{9001, "账户被禁用请联系管理员", nil}
+	ERROR_9002   = OutError{9002, "账号/密码错误请检查后重试", nil}
+	ERROR_9003   = OutError{9003, "账号已存在", nil}
+	ERROR_9004   = OutError{9004, "账号/密码错误请检查后重试", nil}
+	ERROR_9005   = OutError{9005, "密码错误次数过多请稍后再试", nil}
+	ERROR_9006   = OutError{9006, "账户信息异常", nil}
 )
 
-// Error is custom error for additional features.
-type Error struct {
-	error error      // Wrapped error.
-	text  string     // Custom Error text when Error is created, might be empty when its code is not nil.
-	code  pcode.Code // Error code if necessary.
+func (e *OutError) Error() string {
+	return e.Msg
 }
 
-// ICode is the interface for Code feature.
-type ICode interface {
-	Error() string
-	Code() pcode.Code
-}
-
-// IUnwrap is the interface for Unwrap feature.
-type IUnwrap interface {
-	Error() string
-	Unwrap() error
-}
-
-// Error implements the interface of Error, it returns all the error as string.
-func (err *Error) Error() string {
-	if err == nil {
-		return ""
+// New creates and returns an error code.
+// Note that it returns an interface object of Code.
+// code: int
+// msg: string
+// data: interface{}
+func New(code int, msg string, data interface{}) *OutError {
+	if data == nil {
+		data = struct{}{} // nil 转空结构体
 	}
-	errStr := err.text
-	if errStr == "" && err.code != nil {
-		errStr = err.code.Message()
-	}
-	if err.error != nil {
-		if errStr != "" {
-			errStr += ": "
-		}
-		errStr += err.error.Error()
-	}
-	return errStr
-}
-
-// New creates and returns an error which is formatted from given text.
-func New(text string) error {
-	return &Error{
-		text: text,
-		code: pcode.CodeNil,
+	return &OutError{
+		Code: code,
+		Msg:  msg,
+		Data: data,
 	}
 }
 
-// Newf returns an error that formats as the given format and args.
-func Newf(format string, args ...interface{}) error {
-	return &Error{
-		text: fmt.Sprintf(format, args...),
-		code: pcode.CodeNil,
+// Newf creates and returns an error code with format.
+// Note that it returns an interface object of Code.
+// code: int
+// msg: string
+// data: interface{}
+// msgArgs: slice
+func Newf(code int, msg string, data interface{}, msgArgs ...interface{}) *OutError {
+	if data == nil {
+		data = struct{}{} // nil 转空结构体
+	}
+	return &OutError{
+		Code: code,
+		Msg:  fmt.Sprintf(msg, msgArgs...),
+		Data: data,
 	}
 }
 
-// Wrap wraps error with text. It returns nil if given err is nil.
-// Note that it does not lose the error code of wrapped error, as it inherits the error code from it.
-func Wrap(err error, text string) error {
-	if err == nil {
-		return nil
-	}
-	return &Error{
-		error: err,
-		text:  text,
-		code:  Code(err),
-	}
+// GetCode returns the integer number of current error code.
+func (c *OutError) GetCode() int {
+	return c.Code
 }
 
-// Wrapf returns an error annotating err with a stack trace at the point Wrapf is called, and the format specifier.
-// It returns nil if given `err` is nil.
-// Note that it does not lose the error code of wrapped error, as it inherits the error code from it.
-func Wrapf(err error, format string, args ...interface{}) error {
-	if err == nil {
-		return nil
+// GetMsg returns the brief message for current error code.
+func (c *OutError) GetMsg() string {
+	return c.Msg
+}
+
+// GetData returns the detailed information of current error code,
+// which is mainly designed as an extension field for error code.
+func (c *OutError) GetData() interface{} {
+	return c.Data
+}
+
+// GetString returns current error code as a string.
+func (c *OutError) GetString() string {
+	if c.Data != nil {
+		return fmt.Sprintf(`%d:%s %v`, c.Code, c.Msg, c.Data)
 	}
-	return &Error{
-		error: err,
-		text:  fmt.Sprintf(format, args...),
-		code:  Code(err),
+	if c.Msg != "" {
+		return fmt.Sprintf(`%d:%s`, c.Code, c.Msg)
 	}
+	return fmt.Sprintf(`%d`, c.Code)
 }

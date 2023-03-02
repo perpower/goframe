@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ErrorHandle(appName, emailTpl string) gin.HandlerFunc {
+func PanicHandle(appName, emailTpl string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
