@@ -19,10 +19,6 @@ GORM文档地址：
 
 	funcs --- 自定义全局方法
 
-	pconstants --- 常量定义
-
-	structs --- 公用结构体
-
 
 ***
 

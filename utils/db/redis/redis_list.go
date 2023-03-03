@@ -2,7 +2,7 @@
 package redis
 
 import (
-	"github.com/perpower/goframe/funcs"
+	"github.com/perpower/goframe/funcs/normal"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -33,7 +33,7 @@ func (c *Rlist) Lindex(key string, index int) (string, error) {
 //
 // link: https://redis.io/commands/linsert/
 func (c *Rlist) Linsert(key, condition, pivot, element string) (int, error) {
-	if condition == "" || !funcs.InArray(condition, []string{"BEFORE", "AFTER"}) {
+	if condition == "" || !normal.InArray(condition, []string{"BEFORE", "AFTER"}) {
 		panic("参数condition传值不正确,值必须为 BEFORE | AFTER")
 	}
 	return redis.Int(c.conn.Do("LINSERT", key, condition, pivot, element))
@@ -60,10 +60,10 @@ func (c *Rlist) Llen(key string) (int, error) {
 // return: reply string 返回本次操作的元素
 // link: https://redis.io/commands/lmove/
 func (c *Rlist) Lmove(source, destination, wherefrom, whereto string) (string, error) {
-	if wherefrom == "" || !funcs.InArray(wherefrom, []string{"LEFT", "RIGHT"}) {
+	if wherefrom == "" || !normal.InArray(wherefrom, []string{"LEFT", "RIGHT"}) {
 		panic("参数wherefrom传值不正确,值必须为 LEFT | RIGHT")
 	}
-	if whereto == "" || !funcs.InArray(whereto, []string{"LEFT", "RIGHT"}) {
+	if whereto == "" || !normal.InArray(whereto, []string{"LEFT", "RIGHT"}) {
 		panic("参数whereto传值不正确,值必须为 LEFT | RIGHT")
 	}
 	return redis.String(c.conn.Do("LMOVE", source, destination, wherefrom, whereto))
@@ -77,7 +77,7 @@ func (c *Rlist) Lmove(source, destination, wherefrom, whereto string) (string, e
 // return:
 // link: https://redis.io/commands/lmpop/
 func (c *Rlist) Lmpop(keys []string, condition string, count int) (keyName string, arr []string, err error) {
-	if condition == "" || !funcs.InArray(condition, []string{"LEFT", "RIGHT"}) {
+	if condition == "" || !normal.InArray(condition, []string{"LEFT", "RIGHT"}) {
 		panic("参数condition传值不正确,值必须为 LEFT | RIGHT")
 	}
 	if count < 1 {

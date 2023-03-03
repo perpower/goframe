@@ -10,8 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/perpower/goframe/funcs"
+	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/funcs/ptime"
+	"github.com/perpower/goframe/utils/crypto"
 	"github.com/perpower/goframe/utils/errors"
 
 	"github.com/gin-gonic/gin"
@@ -61,12 +62,12 @@ func SignHandle() gin.HandlerFunc {
 
 		_decodeStr, _ := base64.StdEncoding.DecodeString(sign)
 		block, _ := aes.NewCipher([]byte(configs.AuthConfig.Key))
-		decSign := funcs.SubByte(_decodeStr, block.BlockSize(), 0)
+		decSign := normal.SubByte(_decodeStr, block.BlockSize(), 0)
 
-		iv := funcs.SubByte(_decodeStr, 0, block.BlockSize())
-		encryptStr, _ := funcs.AESEncrypt(signStr, configs.AuthConfig.Key, iv)
+		iv := normal.SubByte(_decodeStr, 0, block.BlockSize())
+		encryptStr, _ := crypto.AES.Encrypt(crypto.AES{}, signStr, configs.AuthConfig.Key, iv)
 
-		if encryptStr != funcs.Bytes2String(decSign) {
+		if encryptStr != normal.Bytes2String(decSign) {
 			c.Abort()
 			c.Error(&errors.ERROR_1002)
 			return

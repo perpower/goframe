@@ -1,20 +1,26 @@
-package funcs
+// AES 加解密
+package crypto
 
 import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+
+	"github.com/perpower/goframe/funcs/normal"
 )
 
-// AESDecrypt AES加密 初始向量16字节空 PKCS7 CBC
+// 定义AES 结构体
+type AES struct{}
+
+// Encrypt AES加密 初始向量16字节空 PKCS7 CBC
 // origData: string 待加密串
 // key:密钥 string 16/24/32
 // iv: 向量 []byte
 // 返回:加密后 string
-func AESEncrypt(origData, key string, iv []byte) (string, error) {
-	_data := String2Bytes(origData)
-	_key := String2Bytes(key)
+func (AES) Encrypt(origData, key string, iv []byte) (string, error) {
+	_data := normal.String2Bytes(origData)
+	_key := normal.String2Bytes(key)
 
 	if !validKey(_key) {
 		panic("秘钥长度错误")
@@ -36,14 +42,14 @@ func AESEncrypt(origData, key string, iv []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(dst), nil
 }
 
-// AESEncrypt AES解密 初始向量16字节空 PKCS7 CBC
+// Decrypt AES解密 初始向量16字节空 PKCS7 CBC
 // 入参:origData string 加密字符串
 // key:密钥 string 16/24/32位
 // iv: 向量 []byte
 // 返回:解密后 string
-func AESDecrypt(origData, key string, iv []byte) (string, error) {
+func (AES) Decrypt(origData, key string, iv []byte) (string, error) {
 	_data, _ := base64.StdEncoding.DecodeString(origData)
-	_key := String2Bytes(key)
+	_key := normal.String2Bytes(key)
 
 	if !validKey(_key) {
 		panic("秘钥长度错误")
@@ -62,7 +68,7 @@ func AESDecrypt(origData, key string, iv []byte) (string, error) {
 	//去除补全码
 	dst = pkcs7UnPadding(dst)
 
-	return Bytes2String(dst), nil
+	return normal.Bytes2String(dst), nil
 }
 
 func pkcs7Padding(ciphertext []byte, blockSize int) []byte {

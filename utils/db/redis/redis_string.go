@@ -2,8 +2,8 @@
 package redis
 
 import (
-	"github.com/perpower/goframe/funcs"
 	"github.com/perpower/goframe/funcs/convert"
+	"github.com/perpower/goframe/funcs/normal"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -19,7 +19,7 @@ type Rstring struct {
 // expireType: string 设置生命周期格式， 取值范围：EX | PX | EXAT | PXAT | KEEPTTL
 // 参数对照说明可查阅：https://redis.io/commands/set/
 func (c *Rstring) Set(key, value, condition, expireType string, timeout int64) (reply string, err error) {
-	if condition == "" || !funcs.InArray(condition, []string{"NX", "XX"}) {
+	if condition == "" || !normal.InArray(condition, []string{"NX", "XX"}) {
 		switch expireType {
 		case "EX|PX|EXAT|PXAT":
 			return redis.String(c.conn.Do("SET", key, value, expireType, timeout))
@@ -47,7 +47,7 @@ func (c *Rstring) Set(key, value, condition, expireType string, timeout int64) (
 // expireType: string 设置生命周期格式， 取值范围：EX | PX | EXAT | PXAT | KEEPTTL
 // 参数对照说明可查阅：https://redis.io/commands/set/
 func (c *Rstring) SetGet(key, value, condition, expireType string, timeout int64) (reply string, err error) {
-	if condition == "" || !funcs.InArray(condition, []string{"NX", "XX"}) {
+	if condition == "" || !normal.InArray(condition, []string{"NX", "XX"}) {
 		switch expireType {
 		case "EX|PX|EXAT|PXAT":
 			return redis.String(c.conn.Do("SET", key, value, "GET", expireType, timeout))

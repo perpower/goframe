@@ -8,7 +8,7 @@ import (
 	"html/template"
 	"reflect"
 
-	"github.com/perpower/goframe/funcs"
+	"github.com/perpower/goframe/funcs/dpath"
 
 	"gopkg.in/gomail.v2"
 )
@@ -36,7 +36,8 @@ type EmailConfig struct {
 	Attach  []AttachFormat //附件
 }
 
-// 实例化SMTP Dialer
+// newDialer 实例化SMTP Dialer
+// smtp: 发件服务器配置
 func newDialer(smtp EmailSererConfig) *gomail.Dialer {
 	d := gomail.NewDialer(smtp.ServerAddress, smtp.Port, smtp.Username, smtp.Password)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
@@ -44,8 +45,10 @@ func newDialer(smtp EmailSererConfig) *gomail.Dialer {
 	return d
 }
 
-// 发送邮件
-func Send(smtp EmailSererConfig, params EmailConfig) bool {
+// Send 发送邮件
+// smtp: 发件服务器配置
+// params: 收件人配置
+func Send(smtp EmailSererConfig, params EmailConfig) (bool, error) {
 	d := newDialer(smtp)
 
 	checkConfig := reflect.TypeOf(params)
@@ -59,9 +62,10 @@ func Send(smtp EmailSererConfig, params EmailConfig) bool {
 	m.SetBody("text/html", params.Body)
 	if _, exist := checkConfig.FieldByName("Attach"); exist && len(params.Attach) > 0 {
 		for _, file := range params.Attach {
-			path := funcs.IsPathExist(file.Filename)
+			path := dpath.IsPathExist(file.Filename)
 			if !path {
 				fmt.Println("Error:", file.Filename, "does not exist")
+				continue
 			} else {
 				fmt.Println("uploading", file.Filename, "...")
 				m.Attach(file.Filename, file.Settings...)
@@ -70,13 +74,13 @@ func Send(smtp EmailSererConfig, params EmailConfig) bool {
 	}
 
 	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+		return false, err
 	}
 
-	return true
+	return true, nil
 }
 
-// 获取指定邮件模板内容
+// GetTplContentByFile 获取指定邮件模板内容
 // tplPath: string 邮件模板文件地址
 // mailData: interface{}  解析后的邮件内容
 func GetTplContentByFile(tplPath string, mailData interface{}) (string, error) {
@@ -95,6 +99,8 @@ func GetTplContentByFile(tplPath string, mailData interface{}) (string, error) {
 }
 
 // GetEmailHTMLContent 获取邮件模板
+// mailTpl: string 邮件模板路径
+// mailData: interface{} 邮件默认需要传递的数据
 func GetEmailHTMLContent(mailTpl string, mailData interface{}) (string, error) {
 	tpl, err := template.New("emailTpl.html").Parse(mailTpl)
 	if err != nil {

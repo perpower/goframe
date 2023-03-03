@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/perpower/goframe/funcs"
+	"github.com/perpower/goframe/funcs/normal"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -23,7 +23,7 @@ import (
 func (c *Rzset) Zrange(key, start, stop, byType string, isRev bool, limit []int) ([]string, error) {
 	args := make([]interface{}, 0)
 	args = append(args, key, start, stop)
-	if funcs.InArray(byType, []string{"BYSCORE", "BYLEX"}) {
+	if normal.InArray(byType, []string{"BYSCORE", "BYLEX"}) {
 		args = append(args, byType)
 	}
 
@@ -55,7 +55,7 @@ func (c *Rzset) Zrange(key, start, stop, byType string, isRev bool, limit []int)
 func (c *Rzset) ZrangeWithScore(key, start, stop, byType string, isRev bool, limit []int) (arr [][2]string, err error) {
 	args := make([]interface{}, 0)
 	args = append(args, key, start, stop)
-	if funcs.InArray(byType, []string{"BYSCORE", "BYLEX"}) {
+	if normal.InArray(byType, []string{"BYSCORE", "BYLEX"}) {
 		args = append(args, byType)
 	}
 
@@ -104,7 +104,7 @@ func (c *Rzset) ZrangeWithScore(key, start, stop, byType string, isRev bool, lim
 func (c *Rzset) ZrangeStore(dst, src, min, max, byType string, isRev bool, limit []int) (int, error) {
 	args := make([]interface{}, 0)
 	args = append(args, dst, src, min, max)
-	if funcs.InArray(byType, []string{"BYSCORE", "BYLEX"}) {
+	if normal.InArray(byType, []string{"BYSCORE", "BYLEX"}) {
 		args = append(args, byType)
 	}
 

@@ -2,7 +2,7 @@
 package redis
 
 import (
-	"github.com/perpower/goframe/funcs"
+	"github.com/perpower/goframe/funcs/normal"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -41,10 +41,10 @@ func (c *Rzset) Zadd(key string, scoreElements [][2]string, elementCondition, sc
 
 	args := make([]interface{}, 0)
 	args = append(args, key)
-	if funcs.InArray(elementCondition, []string{"XX", "NX"}) {
+	if normal.InArray(elementCondition, []string{"XX", "NX"}) {
 		args = append(args, elementCondition)
 	}
-	if funcs.InArray(scoreCondition, []string{"LT", "GT"}) {
+	if normal.InArray(scoreCondition, []string{"LT", "GT"}) {
 		args = append(args, scoreCondition)
 	}
 	if isCh {
@@ -84,10 +84,10 @@ func (c *Rzset) Zadd(key string, scoreElements [][2]string, elementCondition, sc
 func (c *Rzset) ZaddIncr(key, score, element string, elementCondition, scoreCondition string, isCh bool) (string, error) {
 	args := make([]interface{}, 0)
 	args = append(args, key)
-	if funcs.InArray(elementCondition, []string{"XX", "NX"}) {
+	if normal.InArray(elementCondition, []string{"XX", "NX"}) {
 		args = append(args, elementCondition)
 	}
-	if funcs.InArray(scoreCondition, []string{"LT", "GT"}) {
+	if normal.InArray(scoreCondition, []string{"LT", "GT"}) {
 		args = append(args, scoreCondition)
 	}
 	if isCh {
@@ -250,7 +250,7 @@ func (c *Rzset) Zinter(keys, weights []string, aggregate string) ([]string, erro
 		}
 	}
 
-	if !funcs.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
+	if !normal.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
 		aggregate = "SUM"
 	}
 	args = append(args, "AGGREGATE", aggregate)
@@ -289,7 +289,7 @@ func (c *Rzset) ZinterWithScore(keys, weights []string, aggregate string) (arr [
 		}
 	}
 
-	if !funcs.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
+	if !normal.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
 		aggregate = "SUM"
 	}
 	args = append(args, "AGGREGATE", aggregate, "WITHSCORES")
@@ -366,7 +366,7 @@ func (c *Rzset) ZinterStore(destination string, keys, weights []string, aggregat
 		}
 	}
 
-	if !funcs.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
+	if !normal.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
 		aggregate = "SUM"
 	}
 	args = append(args, "AGGREGATE", aggregate)
@@ -400,7 +400,7 @@ func (c *Rzset) Zlexcount(key, min, max string) (string, error) {
 //
 // link: https://redis.io/commands/zmpop/
 func (c *Rzset) Zmpop(keys []string, condition string, count int) (keyName string, arr [][2]string, err error) {
-	if condition == "" || !funcs.InArray(condition, []string{"MIN", "MAX"}) {
+	if condition == "" || !normal.InArray(condition, []string{"MIN", "MAX"}) {
 		panic("参数condition传值不正确,值必须为 MIN | MAX")
 	}
 	if count < 1 {
@@ -634,7 +634,7 @@ func (c *Rzset) Zunion(keys, weights []string, aggregate string) ([]string, erro
 		}
 	}
 
-	if !funcs.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
+	if !normal.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
 		aggregate = "SUM"
 	}
 	args = append(args, "AGGREGATE", aggregate)
@@ -673,7 +673,7 @@ func (c *Rzset) ZunionWithScore(keys, weights []string, aggregate string) (arr [
 		}
 	}
 
-	if !funcs.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
+	if !normal.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
 		aggregate = "SUM"
 	}
 	args = append(args, "AGGREGATE", aggregate, "WITHSCORES")
@@ -726,7 +726,7 @@ func (c *Rzset) ZunionStore(destination string, keys, weights []string, aggregat
 		}
 	}
 
-	if !funcs.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
+	if !normal.InArray(aggregate, []string{"SUM", "MIN", "MAX"}) {
 		aggregate = "SUM"
 	}
 	args = append(args, "AGGREGATE", aggregate)

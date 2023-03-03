@@ -65,7 +65,7 @@ func New(code int, msg string, data interface{}) *OutError {
 // code: int
 // msg: string
 // data: interface{}
-// msgArgs: slice
+// msgArgs: slice interface{}
 func Newf(code int, msg string, data interface{}, msgArgs ...interface{}) *OutError {
 	if data == nil {
 		data = struct{}{} // nil 转空结构体
