@@ -10,7 +10,7 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/perpower/goframe/funcs"
+	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/funcs/ptime"
 	"github.com/perpower/goframe/utils/logger"
 	"github.com/perpower/goframe/utils/mailer"
@@ -50,7 +50,7 @@ func Email(c *gin.Context, appName, emailTpl string, err interface{}) error {
 	body, err := mailer.GetTplContentByFile(emailTpl, ErrorMsg)
 
 	if err == nil {
-		_ = mailer.Send(mailer.EmailSererConfig{
+		mailer.Send(mailer.EmailSererConfig{
 			ServerAddress: configs.EmailAccount["serverAddress"].(string),
 			Port:          configs.EmailAccount["port"].(int),
 			Username:      configs.EmailAccount["username"].(string),
@@ -81,7 +81,7 @@ func alarm(c *gin.Context, appName, level string, err interface{}) (ErrorMsg err
 
 	requestBody, _ := io.ReadAll(c.Request.Body)
 	if requestBody != nil {
-		ErrorMsg.RequestBody = funcs.Bytes2String(requestBody)
+		ErrorMsg.RequestBody = normal.Bytes2String(requestBody)
 	}
 	// 通过 ioutil.ReadAll() 来读取完 body 内容后，body 就为空了，把字节流重新放回 body 中
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(requestBody))

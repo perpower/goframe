@@ -10,7 +10,6 @@ import (
 	"github.com/perpower/goframe/funcs/judge"
 	"github.com/perpower/goframe/funcs/pregex"
 	"github.com/perpower/goframe/utils/errors"
-	"github.com/perpower/goframe/utils/pcode"
 )
 
 type wrapper struct {
@@ -224,7 +223,7 @@ func ParseDuration(s string) (duration time.Duration, err error) {
 	if judge.IsNumeric(s) {
 		num, err = strconv.ParseInt(s, 10, 64)
 		if err != nil {
-			err = errors.WrapCodef(pcode.CodeInvalidParameter, err, `strconv.ParseInt failed for string "%s"`, s)
+			err = errors.Newf(errors.ERROR_3000.Code, `strconv.ParseInt failed for string "%s"`, err, s)
 			return 0, err
 		}
 		return time.Duration(num), nil
@@ -236,18 +235,18 @@ func ParseDuration(s string) (duration time.Duration, err error) {
 	if len(match) == 3 {
 		num, err = strconv.ParseInt(match[1], 10, 64)
 		if err != nil {
-			err = errors.WrapCodef(pcode.CodeInvalidParameter, err, `strconv.ParseInt failed for string "%s"`, match[1])
+			err = errors.Newf(errors.ERROR_3000.Code, `strconv.ParseInt failed for string "%s"`, err, match[1])
 			return 0, err
 		}
 		s = fmt.Sprintf(`%dh%s`, num*24, match[2])
 		duration, err = time.ParseDuration(s)
 		if err != nil {
-			err = errors.WrapCodef(pcode.CodeInvalidParameter, err, `time.ParseDuration failed for string "%s"`, s)
+			err = errors.Newf(errors.ERROR_3000.Code, `time.ParseDuration failed for string "%s"`, err, s)
 		}
 		return
 	}
 	duration, err = time.ParseDuration(s)
-	err = errors.WrapCodef(pcode.CodeInvalidParameter, err, `time.ParseDuration failed for string "%s"`, s)
+	err = errors.Newf(errors.ERROR_3000.Code, `time.ParseDuration failed for string "%s"`, err, s)
 	return
 }
 
@@ -291,7 +290,7 @@ func StrToTime(str string, format ...string) (*Time, error) {
 		}
 		return NewFromTime(time.Date(0, time.Month(1), 1, hour, min, sec, nsec, local)), nil
 	} else {
-		return nil, errors.NewCodef(pcode.CodeInvalidParameter, `unsupported time converting for string "%s"`, str)
+		return nil, errors.Newf(errors.ERROR_3000.Code, `unsupported time converting for string "%s"`, nil, str)
 	}
 
 	// Time
@@ -326,7 +325,7 @@ func StrToTime(str string, format ...string) (*Time, error) {
 			m, _ := strconv.Atoi(zone[2:4])
 			s, _ := strconv.Atoi(zone[4:6])
 			if h > 24 || m > 59 || s > 59 {
-				return nil, errors.NewCodef(pcode.CodeInvalidParameter, `invalid zone string "%s"`, match[6])
+				return nil, errors.Newf(errors.ERROR_3000.Code, `invalid zone string "%s"`, nil, match[6])
 			}
 			operation := match[5]
 			if operation != "+" && operation != "-" {
@@ -367,7 +366,7 @@ func StrToTime(str string, format ...string) (*Time, error) {
 		}
 	}
 	if month <= 0 || day <= 0 {
-		return nil, errors.NewCodef(pcode.CodeInvalidParameter, `invalid time string "%s"`, str)
+		return nil, errors.Newf(errors.ERROR_3000.Code, `invalid time string "%s"`, nil, str)
 	}
 	return NewFromTime(time.Date(year, time.Month(month), day, hour, min, sec, nsec, local)), nil
 }
@@ -384,11 +383,7 @@ func StrToTimeLayout(str string, layout string) (*Time, error) {
 	if t, err := time.ParseInLocation(layout, str, time.Local); err == nil {
 		return NewFromTime(t), nil
 	} else {
-		return nil, errors.WrapCodef(
-			pcode.CodeInvalidParameter, err,
-			`time.ParseInLocation failed for layout "%s" and value "%s"`,
-			layout, str,
-		)
+		return nil, errors.Newf(errors.ERROR_3000.Code, `time.ParseInLocation failed for layout "%s" and value "%s"`, err, layout, str)
 	}
 }
 

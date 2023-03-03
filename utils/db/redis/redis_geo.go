@@ -2,8 +2,8 @@
 package redis
 
 import (
-	"github.com/perpower/goframe/funcs"
 	"github.com/perpower/goframe/funcs/convert"
+	"github.com/perpower/goframe/funcs/normal"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -31,7 +31,7 @@ func (c *Rgeo) GeoAdd(key string, points [][3]string, elementCondition string, i
 
 	args := make([]interface{}, 0)
 	args = append(args, key)
-	if funcs.InArray(elementCondition, []string{"XX", "NX"}) {
+	if normal.InArray(elementCondition, []string{"XX", "NX"}) {
 		args = append(args, elementCondition)
 	}
 	if isCh {
@@ -64,7 +64,7 @@ func (c *Rgeo) GeoDist(key string, members [2]string, unit string) (string, erro
 	if len(members) != 2 {
 		panic("参数members必须包含两个值")
 	}
-	if !funcs.InArray(unit, []string{"M", "KM", "MI", "FT"}) {
+	if !normal.InArray(unit, []string{"M", "KM", "MI", "FT"}) {
 		unit = "M"
 	}
 
@@ -163,7 +163,7 @@ func (c *Rgeo) GeoSearchFromMemberNoWith(key, member string, byType []string, so
 		args = append(args, v)
 	}
 
-	if !funcs.InArray(sort, []string{"ASC", "DESC"}) {
+	if !normal.InArray(sort, []string{"ASC", "DESC"}) {
 		sort = "ASC"
 	}
 	args = append(args, sort)
@@ -215,7 +215,7 @@ func (c *Rgeo) GeoSearchFromMemberHasWith(key, member string, byType []string, s
 		args = append(args, v)
 	}
 
-	if !funcs.InArray(sort, []string{"ASC", "DESC"}) {
+	if !normal.InArray(sort, []string{"ASC", "DESC"}) {
 		sort = "ASC"
 	}
 	args = append(args, sort)
@@ -292,7 +292,7 @@ func (c *Rgeo) GeoSearchFromLonlatNoWith(key string, poi [2]string, byType []str
 		args = append(args, v)
 	}
 
-	if !funcs.InArray(sort, []string{"ASC", "DESC"}) {
+	if !normal.InArray(sort, []string{"ASC", "DESC"}) {
 		sort = "ASC"
 	}
 	args = append(args, sort)
@@ -347,7 +347,7 @@ func (c *Rgeo) GeoSearchFromLonlatHasWith(key string, poi [2]string, byType []st
 		args = append(args, v)
 	}
 
-	if !funcs.InArray(sort, []string{"ASC", "DESC"}) {
+	if !normal.InArray(sort, []string{"ASC", "DESC"}) {
 		sort = "ASC"
 	}
 	args = append(args, sort)
@@ -423,7 +423,7 @@ func (c *Rgeo) GeoSearchFromMemberStore(destination, source, member string, byTy
 		args = append(args, v)
 	}
 
-	if !funcs.InArray(sort, []string{"ASC", "DESC"}) {
+	if !normal.InArray(sort, []string{"ASC", "DESC"}) {
 		sort = "ASC"
 	}
 	args = append(args, sort)
@@ -479,7 +479,7 @@ func (c *Rgeo) GeoSearchFromLonlatStore(destination, source string, poi [2]strin
 		args = append(args, v)
 	}
 
-	if !funcs.InArray(sort, []string{"ASC", "DESC"}) {
+	if !normal.InArray(sort, []string{"ASC", "DESC"}) {
 		sort = "ASC"
 	}
 	args = append(args, sort)

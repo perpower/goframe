@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/perpower/goframe/funcs"
+	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/funcs/ptime"
 
 	"github.com/gin-gonic/gin"
@@ -206,7 +206,7 @@ func convertRequestInfo() zapcore.Field {
 
 	requestBody, _ := io.ReadAll(ctx.Request.Body)
 	if requestBody != nil {
-		requestInfo.RequestBody = funcs.Bytes2String(requestBody)
+		requestInfo.RequestBody = normal.Bytes2String(requestBody)
 	}
 	// 通过 ioutil.ReadAll() 来读取完 body 内容后，body 就为空了，把字节流重新放回 body 中
 	ctx.Request.Body = io.NopCloser(bytes.NewBuffer(requestBody))

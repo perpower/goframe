@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func LoggerRecord(conf logger.LogFileConfig) gin.HandlerFunc {
+func LoggerHandle(conf logger.LogFileConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger.InitLogger(c, conf) //初始化日志组件
 		defer logger.Logger.Sync()

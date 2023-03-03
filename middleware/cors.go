@@ -6,8 +6,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/perpower/goframe/funcs"
 	"github.com/perpower/goframe/funcs/convert"
+	"github.com/perpower/goframe/funcs/normal"
+	"github.com/perpower/goframe/funcs/pos"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
@@ -33,16 +34,16 @@ var (
 )
 
 func init() {
-	array := funcs.SplitAndTrim(defaultAllowHeaders, ",")
+	array := normal.SplitAndTrim(defaultAllowHeaders, ",")
 	for _, header := range array {
 		defaultAllowHeadersMap[header] = struct{}{}
 	}
 }
 
-func Cors() gin.HandlerFunc {
+func CorsHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		conf := CorsOptions{}
-		if f, err := os.ReadFile(funcs.GetRootPath() + "/configs/cors.yml"); err != nil {
+		if f, err := os.ReadFile("./configs/cors.yml"); err != nil {
 			conf := DefaultCorsOptions(c)
 			SetCors(c, conf)
 		} else {
@@ -69,7 +70,7 @@ func DefaultCorsOptions(c *gin.Context) CorsOptions {
 	}
 	// Allow all client's custom headers in default.
 	if headers := c.Request.Header.Get("Access-Control-Request-Headers"); headers != "" {
-		array := funcs.SplitAndTrim(headers, ",")
+		array := normal.SplitAndTrim(headers, ",")
 		for _, header := range array {
 			if _, ok := defaultAllowHeadersMap[header]; !ok {
 				options.AllowHeaders += "," + header
@@ -80,7 +81,7 @@ func DefaultCorsOptions(c *gin.Context) CorsOptions {
 	if origin := c.Request.Header.Get("Origin"); origin != "" {
 		options.AllowOrigin = origin
 	} else if referer := c.Request.Referer(); referer != "" {
-		if p := funcs.PosR(referer, "/", 6); p != -1 {
+		if p := pos.PosR(referer, "/", 6); p != -1 {
 			options.AllowOrigin = referer[:p]
 		} else {
 			options.AllowOrigin = referer
@@ -116,7 +117,7 @@ func SetCors(c *gin.Context, options CorsOptions) {
 	// No continue service handling if it's OPTIONS request.
 	// Note that there's special checks in previous router searching,
 	// so if it goes to here it means there's already serving handler exist.
-	if funcs.Equal(c.Request.Method, "OPTIONS") {
+	if normal.Equal(c.Request.Method, "OPTIONS") {
 		c.AbortWithStatus(http.StatusNoContent)
 		// No continue serving.
 		return
@@ -125,7 +126,7 @@ func SetCors(c *gin.Context, options CorsOptions) {
 
 // CORSAllowedOrigin CORSAllowed checks whether the current request origin is allowed cross-domain.
 func CorsAllowedOrigin(c *gin.Context, options CorsOptions) bool {
-	if options.AllowDomain == nil || len(options.AllowDomain) == 0 || funcs.InArray("*", options.AllowDomain) {
+	if options.AllowDomain == nil || len(options.AllowDomain) == 0 || normal.InArray("*", options.AllowDomain) {
 		return true
 	}
 	origin := c.Request.Header.Get("Origin")
@@ -137,7 +138,7 @@ func CorsAllowedOrigin(c *gin.Context, options CorsOptions) bool {
 		return false
 	}
 
-	if funcs.InArray(parsed.Host, options.AllowDomain) {
+	if normal.InArray(parsed.Host, options.AllowDomain) {
 		return true
 	}
 

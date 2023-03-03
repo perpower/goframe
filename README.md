@@ -1,8 +1,9 @@
 # goframe基础开发框架
 
-开发框架基于GIN框架，数据库操作依赖 GORM 开源包,开发之前需要掌握GO基本的语法知识。
+开发框架基于GIN框架，数据库操作依赖 GORM 开源包。
 
-GIN框架文档地址：[https://gin-gonic.com/zh-cn/docs/introduction/](https://gin-gonic.com/zh-cn/docs/introduction/)
+GIN框架文档地址：
+[https://gin-gonic.com/zh-cn/docs/introduction/](https://gin-gonic.com/zh-cn/docs/introduction/)
 
 GORM文档地址：
 [https://gorm.io/zh\_CN/docs/index.html](https://gorm.io/zh_CN/docs/index.html)
@@ -17,10 +18,6 @@ GORM文档地址：
 	middleware --- 中间件
 
 	funcs --- 自定义全局方法
-
-	pconstants --- 常量定义
-
-	structs --- 公用结构体
 
 
 ***
@@ -43,6 +40,7 @@ GORM文档地址：
 * [x] 14\.  mysql数据库操作方法封装
 * [x] 15\.  snowflake 分布式唯一ID生成工具
 * [x] 16\.  随机数生成工具
-* [ ] 17\.  微信小程序用户授权登录机制
-* [ ] 18\.  I18N国际化
+* [x] 17\.  errors全局错误处理
+* [ ] 18\.  微信小程序用户授权登录机制
+* [ ] 19\.  I18N国际化
 * [ ] 更多功能持续迭代。。。
