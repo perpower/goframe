@@ -79,7 +79,7 @@ func getMilliStamp() int64 {
 // Generate 生成一个唯一ID
 // return: string
 func (s *Snowflake) Generate() (string, error) {
-	exit, _ := redisClient.Exists([]string{redisPre + ":idsList"})
+	exit, _ := redisClient.Db.Exists([]string{redisPre + ":idsList"})
 	if exit == 0 {
 		s.Produce(onceNums)
 	}
