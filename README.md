@@ -34,7 +34,7 @@ GORM文档地址：
 * [x] 8\.  短信能力，目前仅接入腾讯云短信，可扩展其它
 * [x] 9\.  Timer定时器，引用第三方包[https://github.com/gogf/gf/v2/os/gtimer](https://github.com/gogf/gf/v2/os/gtimer)实现
 * [x] 10\.  Cron定时任务，引用第三方包[https://github.com/gogf/gf/v2/os/gcron](https://github.com/gogf/gf/v2/os/gcron)实现
-* [x] 11\.  Redis常用操作能力封装，基于第三方包[github.com/gomodule/redigo/redis]([https://](https://pkg.go.dev/)github.com/gomodule/redigo/redis)实现: string,hash,list,set,zset,expire,scan,geo,bit,transaction
+* [x] 11\.  Redis常用操作能力封装，基于第三方包[github.com/gomodule/redigo/redis]([https://](https://pkg.go.dev/)github.com/gomodule/redigo/redis)实现: string,hash,list,set,zset,expire,scan,geo,bit,transaction,HyperLogLog
 * [x] 12\.  Excel文件导入导出,基与第三方包[github.com/xuri/excelize/v2](https://pkg.go.dev/github.com/xuri/excelize/v2)实现
 * [x] 13\.  生成二维码&图片合成工具
 * [x] 14\.  mysql数据库操作方法封装
