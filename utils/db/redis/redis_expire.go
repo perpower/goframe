@@ -104,3 +104,15 @@ func (c *Rexpire) PexpireTime(key string) (reply int64, err error) {
 func (c *Rexpire) Persist(key string) (reply int, err error) {
 	return redis.Int(c.conn.Do("PERSIST", key))
 }
+
+// 返回指定key的秒级剩余生存时间
+// key: string 键名
+// return:
+//
+//	   reply: int
+//				 TTL in seconds
+//			     -1: key存在但未设置过过期时间
+//			     -2: key不存在
+func (c *Rexpire) Ttl(key string) (reply int, err error) {
+	return redis.Int(c.conn.Do("TTL", key))
+}
