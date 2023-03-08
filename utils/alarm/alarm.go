@@ -12,7 +12,6 @@ import (
 
 	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/funcs/ptime"
-	"github.com/perpower/goframe/utils/logger"
 	"github.com/perpower/goframe/utils/mailer"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +41,10 @@ func Info(c *gin.Context, appName string, err interface{}) error {
 	return &errorString{fmt.Sprintf("%v", err)}
 }
 
-// 发邮件
+// Email 发邮件
+// appName: string 系统名称
+// emailTpl: string 邮件模板文件路径
+// err: interface{} 错误信息
 func Email(c *gin.Context, appName, emailTpl string, err interface{}) error {
 	ErrorMsg := alarm(c, appName, "email", err)
 
@@ -64,7 +66,10 @@ func Email(c *gin.Context, appName, emailTpl string, err interface{}) error {
 	return &errorString{fmt.Sprintf("%v", err)}
 }
 
-// 告警方法
+// alarm 告警方法
+// appName: string 系统名称
+// level: string 错误等级
+// err: interface{} 错误信息
 func alarm(c *gin.Context, appName, level string, err interface{}) (ErrorMsg errorInfo) {
 	DebugStack := strings.Split(string(debug.Stack()), "\n")
 
@@ -86,15 +91,7 @@ func alarm(c *gin.Context, appName, level string, err interface{}) (ErrorMsg err
 	// 通过 ioutil.ReadAll() 来读取完 body 内容后，body 就为空了，把字节流重新放回 body 中
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(requestBody))
 
-	jsons, errs := json.Marshal(ErrorMsg)
-	if errs != nil {
-		logger.Error("json marshal error", logger.ExtendFields{
-			Key:   "errorInfo",
-			Value: err,
-		})
-	}
-	errorJsonInfo := string(jsons)
-	logger.Info(errorJsonInfo)
+	json.Marshal(ErrorMsg)
 
 	return ErrorMsg
 }

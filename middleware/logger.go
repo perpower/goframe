@@ -2,16 +2,19 @@
 package middleware
 
 import (
+	"go-framework/global"
+
 	"github.com/perpower/goframe/utils/logger"
 
 	"github.com/gin-gonic/gin"
 )
 
-func LoggerHandle(conf logger.LogFileConfig) gin.HandlerFunc {
+// LoggerHandle
+// conf: interface{}
+func LoggerHandle(conf interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		logger.InitLogger(c, conf) //初始化日志组件
-		defer logger.Logger.Sync()
-
+		plog := logger.InitLogger(c, global.LogPlatform, conf)
+		global.Plog = plog
 		c.Next()
 	}
 }
