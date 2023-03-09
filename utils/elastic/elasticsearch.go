@@ -1,8 +1,6 @@
 package elastic
 
 import (
-	"fmt"
-
 	es7 "github.com/olivere/elastic/v7"
 )
 
@@ -22,20 +20,26 @@ type Client struct {
 }
 
 // Instance 客户端链接实例化
-func Instance(conf ElastiConfig) (*Client, error) {
-	client, err := es7.NewClient(
-		es7.SetURL(conf.Nodes...),
-		es7.SetBasicAuth(conf.Auth.Username, conf.Auth.Password),
-		es7.SetScheme(conf.DefaultProtocol),
-		es7.SetHealthcheck(conf.HealthCheck),
-	)
+func Instance(conf ElastiConfig) (c *Client, err error) {
+	var client *es7.Client
+	switch conf.Version {
+	case 7:
+		client, err = es7.NewClient(
+			es7.SetURL(conf.Nodes...),
+			es7.SetBasicAuth(conf.Auth.Username, conf.Auth.Password),
+			es7.SetScheme(conf.DefaultProtocol),
+			es7.SetHealthcheck(conf.HealthCheck),
+			es7.SetSniff(false), // 这里设置成不需要地址自动转换，否则会报错context deadline exceeded
+		)
+	default:
+		panic("ElasticSearch版本配置有误")
+	}
 
-	fmt.Println(client, err)
 	if err != nil {
 		return nil, err
 	}
 
-	c := &Client{
+	c = &Client{
 		V7: &Es7{
 			conn: client,
 		},

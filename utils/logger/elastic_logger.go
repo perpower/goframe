@@ -2,9 +2,11 @@
 package logger
 
 import (
+	"encoding/json"
 	"strconv"
 	"time"
 
+	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/utils/elastic"
 )
 
@@ -30,19 +32,23 @@ func CreateElasticLog(level, IndexName, msg string, filedSlice ...ExtendFields) 
 	}
 	if createIndex(IndexName) {
 		params := requestInfo()
-		docContent := map[string]interface{}{
+		extraDatas, _ := json.Marshal(filedSlice)
+		docContent, _ := json.Marshal(map[string]interface{}{
+			"@requestTime":  params.RequestTime,
 			"logLevel":      level,
-			"requestTime":   params.RequestTime,
 			"requestMethod": params.RequestMethod,
 			"requestHost":   params.RequestHost,
 			"requestUri":    params.RequestUri,
 			"userAgent":     params.UserAgent,
 			"clientIp":      params.ClientIp,
+			"headers":       params.Headers,
+			"refer":         params.Refer,
 			"requestBody":   params.RequestBody,
-			"extraDatas":    filedSlice,
+			"extraDatas":    normal.Bytes2String(extraDatas),
 			"message":       msg,
-		}
-		return esclient.V7.CreateDoc(IndexName, docContent)
+		})
+		res, err := esclient.V7.CreateDoc(IndexName, normal.Bytes2String(docContent))
+		return res, err
 	}
 	return "", nil
 }
@@ -58,39 +64,46 @@ func createIndex(indexName string) bool {
 	if !status { // 如果索引不存在，则创建
 		mappings := `{
 			"mappings": {
-				"_doc": {
-					"properties": {
-						"logLevel": {
-							"type": "keyword"
-						}
-						"requestTime": {
-							"type": "date",
-							"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
-						},
-						"requestMethod": {
-							"type": "text"
-						},
-						"requestHost": {
-							"type": "keyword"
-						},
-						"requestUri": {
-							"type": "text"
-						},
-						"userAgent": {
-							"type": "text"
-						},
-						"clientIp": {
-							"type": "IP"
-						},
-						"requestBody": {
-							"type": "object"
-						},
-						"extraDatas": {
-							"type": "arrays"
-						}
-						"message": {
-							"type": "text"
-						}
+				"properties": {
+					"@requestTime": {
+						"type": "date",
+						"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+					},
+					"logLevel": {
+						"type": "keyword"
+					},				
+					"requestMethod": {
+						"type": "text"
+					},
+					"requestProto": {
+						"type": "text"
+					},
+					"requestHost": {
+						"type": "keyword"
+					},
+					"requestUri": {
+						"type": "text"
+					},
+					"userAgent": {
+						"type": "text"
+					},
+					"clientIp": {
+						"type": "ip"
+					},
+					"headers": {
+						"type": "object"
+					},
+					"refer": {
+						"type": "text"
+					},
+					"requestBody": {
+						"type": "text"
+					},
+					"extraDatas": {
+						"type": "text"
+					},
+					"message": {
+						"type": "text"
 					}
 				}
 			}

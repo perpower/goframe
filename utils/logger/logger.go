@@ -20,13 +20,16 @@ type ExtendFields struct {
 
 // request请求信息结构体
 type requestFields struct {
-	RequestTime   string `json:"requestTime"`   // 请求时间
-	RequestMethod string `json:"requestMethod"` // 请求方式
-	RequestHost   string `json:"requestHost"`   // 主机地址
-	RequestUri    string `json:"requestUri"`    // 请求地址
-	UserAgent     string `json:"userAgent"`     // UserAgent
-	ClientIp      string `json:"clientIp"`      // 请求IP
-	RequestBody   string `json:"requestBody"`   // 请求body
+	RequestTime   string              `json:"requestTime"`   // 请求时间
+	RequestMethod string              `json:"requestMethod"` // 请求方式
+	RequestProto  string              `json:"requestProto"`  // 请求协议
+	RequestHost   string              `json:"requestHost"`   // 主机地址
+	RequestUri    string              `json:"requestUri"`    // 请求地址
+	UserAgent     string              `json:"userAgent"`     // UserAgent
+	ClientIp      string              `json:"clientIp"`      // 请求IP
+	Headers       map[string][]string `json:"headers"`       // 请求header
+	Refer         string              `json:"refer"`         // 请求 refer
+	RequestBody   string              `json:"requestBody"`   // 请求body
 }
 
 // 定义日志输出的接口方法
@@ -68,12 +71,15 @@ func InitLogger(c *gin.Context, platform string, conf interface{}) *Output {
 // Request 请求基础数据
 func requestInfo() requestFields {
 	requestInfo := requestFields{
-		RequestTime:   ptime.TimestampStr(),
+		RequestTime:   ptime.TimestampMilliStr(),
 		RequestMethod: ctx.Request.Method,
+		RequestProto:  ctx.Request.Proto,
 		RequestHost:   ctx.Request.Host,
 		RequestUri:    ctx.Request.RequestURI,
 		UserAgent:     ctx.Request.UserAgent(),
 		ClientIp:      ctx.ClientIP(),
+		Headers:       ctx.Request.Header,
+		Refer:         ctx.Request.Referer(),
 	}
 
 	requestBody, _ := io.ReadAll(ctx.Request.Body)

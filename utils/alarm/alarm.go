@@ -23,14 +23,16 @@ type errorString struct {
 
 // 告警内容结构体
 type errorInfo struct {
-	AppName     string //系统名称
-	ErrorMsg    string //错误信息
-	RequestTime string //请求时间
-	RequestURL  string //请求地址
+	AppName     string // 系统名称
+	ErrorMsg    string // 错误信息
+	RequestTime string // 请求时间
+	RequestURL  string // 请求地址
 	RequestBody string
-	RequestUA   string   //UserAgent
-	RequestIP   string   //请求IP
-	DebugStack  []string //错误跟踪信息
+	UserAgent   string   // UserAgent
+	ClientIp    string   // 请求IP
+	Headers     string   // 请求header
+	Refer       string   // 请求 refer
+	DebugStack  []string // 错误跟踪信息
 }
 
 func (e *errorString) Error() string {
@@ -50,7 +52,6 @@ func Email(c *gin.Context, appName, emailTpl string, err interface{}) error {
 
 	subject := fmt.Sprintf("【错误告警】- %s 项目出错了！", appName)
 	body, err := mailer.GetTplContentByFile(emailTpl, ErrorMsg)
-
 	if err == nil {
 		mailer.Send(mailer.EmailSererConfig{
 			ServerAddress: configs.EmailAccount["serverAddress"].(string),
@@ -73,15 +74,17 @@ func Email(c *gin.Context, appName, emailTpl string, err interface{}) error {
 func alarm(c *gin.Context, appName, level string, err interface{}) (ErrorMsg errorInfo) {
 	DebugStack := strings.Split(string(debug.Stack()), "\n")
 
+	headers, _ := json.Marshal(c.Request.Header)
 	ErrorMsg = errorInfo{
 		AppName:     appName,
 		ErrorMsg:    fmt.Sprintf("%s", err),
 		RequestTime: ptime.TimestampStr(),
 		RequestURL:  c.Request.Method + "  " + c.Request.Host + c.Request.RequestURI,
-		RequestUA:   c.Request.UserAgent(),
-		RequestIP:   c.ClientIP(),
-
-		DebugStack: DebugStack,
+		UserAgent:   c.Request.UserAgent(),
+		ClientIp:    c.ClientIP(),
+		Headers:     normal.Bytes2String(headers),
+		Refer:       c.Request.Referer(),
+		DebugStack:  DebugStack,
 	}
 
 	requestBody, _ := io.ReadAll(c.Request.Body)
