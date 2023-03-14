@@ -7,6 +7,7 @@ require (
 	github.com/gogf/gf/v2 v2.3.2
 	github.com/gomodule/redigo v1.8.9
 	github.com/juju/ratelimit v1.0.2
+	github.com/olivere/elastic/v7 v7.0.32
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.605
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms v1.0.605
@@ -48,7 +49,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/mozillazg/go-httpheader v0.2.1 // indirect
-	github.com/olivere/elastic/v7 v7.0.32 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
