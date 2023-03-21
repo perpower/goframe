@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"go-framework/configs"
 	"io"
 	"runtime/debug"
 	"strings"
@@ -47,19 +46,14 @@ func Info(c *gin.Context, appName string, err interface{}) error {
 // appName: string 系统名称
 // emailTpl: string 邮件模板文件路径
 // err: interface{} 错误信息
-func Email(c *gin.Context, appName, emailTpl string, err interface{}) error {
+func Email(c *gin.Context, appName string, emailServerConfig mailer.EmailSererConfig, receivers []string, emailTpl string, err interface{}) error {
 	ErrorMsg := alarm(c, appName, "email", err)
 
 	subject := fmt.Sprintf("【错误告警】- %s 项目出错了！", appName)
 	body, err := mailer.GetTplContentByFile(emailTpl, ErrorMsg)
 	if err == nil {
-		mailer.Send(mailer.EmailSererConfig{
-			ServerAddress: configs.EmailAccount["serverAddress"].(string),
-			Port:          configs.EmailAccount["port"].(int),
-			Username:      configs.EmailAccount["username"].(string),
-			Password:      configs.EmailAccount["password"].(string),
-		}, mailer.EmailConfig{
-			To:      []string{configs.EmailAccount["username"].(string)},
+		mailer.Send(emailServerConfig, mailer.EmailConfig{
+			To:      receivers,
 			Subject: subject,
 			Body:    body,
 		})

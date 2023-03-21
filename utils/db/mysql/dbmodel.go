@@ -141,6 +141,35 @@ func (db *Db) GetList(params FilterParams) (res []map[string]interface{}, count 
 	return res, count, err
 }
 
+// GetListCursor 游标法查询数据列表
+// params: FilterParams 查询条件
+// limitSize: int 查询数据条数
+// cursorWhere: []QueryArgs  游标过滤条件
+// return:
+//
+//	res: []map[string]interface{} 查询结果
+//	count: int64 匹配查询条件的总记录数
+func (db *Db) GetListCursor(params FilterParams, limitSize int, cursorWhere ...QueryArgs) (res []map[string]interface{}, count int64, err error) {
+	conn, _ := db.FilterWhere(params)
+
+	//统计满足匹配条件的数据总数
+	conn.Count(&count)
+
+	// 加入游标过滤条件
+	if len(cursorWhere) > 0 {
+		for _, val := range cursorWhere {
+			conn.Where(val.Query, val.Args...)
+		}
+	}
+	conn.Limit(limitSize)
+
+	result := conn.Find(&res)
+
+	err = result.Error
+
+	return res, count, err
+}
+
 // FilterWhere 统一处理查询条件
 // params: FilterParams  查询条件
 func (db *Db) FilterWhere(params FilterParams) (*gorm.DB, reflect.Type) {
