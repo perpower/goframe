@@ -152,6 +152,5 @@ func convertFields(filedSlice ...ExtendFields) zapcore.Field {
 // convertRequestInfo 默认补充Request 请求基础数据
 func convertRequestInfo() zapcore.Field {
 	requestInfo := requestInfo()
-
 	return zap.String("RequestInfo", fmt.Sprintf("%+v", requestInfo))
 }

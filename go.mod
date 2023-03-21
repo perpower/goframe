@@ -13,6 +13,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms v1.0.605
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.41
 	github.com/thinkeridea/go-extend v1.3.2
+	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/xuri/excelize/v2 v2.7.0
 	go.uber.org/zap v1.24.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
@@ -36,7 +37,7 @@ require (
 	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
@@ -55,6 +56,7 @@ require (
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
