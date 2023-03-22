@@ -4,14 +4,13 @@ package middleware
 import (
 	"net/http"
 	"net/url"
-	"os"
+	"reflect"
 
 	"github.com/perpower/goframe/funcs/convert"
 	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/funcs/pos"
 
 	"github.com/gin-gonic/gin"
-	"gopkg.in/yaml.v3"
 )
 
 // 服务端允许跨域请求选项
@@ -40,17 +39,12 @@ func init() {
 	}
 }
 
-func CorsHandle() gin.HandlerFunc {
+func CorsHandle(conf CorsOptions) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		conf := CorsOptions{}
-		if f, err := os.ReadFile("./configs/cors.yml"); err != nil {
+		if reflect.DeepEqual(conf, CorsOptions{}) { // 判断是否为空结构体
 			conf := DefaultCorsOptions(c)
 			SetCors(c, conf)
 		} else {
-			err = yaml.Unmarshal(f, &conf) //解析yaml文件配置内容
-			if err != nil {
-				panic(err)
-			}
 			SetCors(c, conf)
 		}
 

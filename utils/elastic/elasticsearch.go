@@ -2,11 +2,10 @@ package elastic
 
 import (
 	es7 "github.com/olivere/elastic/v7"
-	"github.com/perpower/goframe/funcs/normal"
 )
 
 type ElastiConfig struct {
-	Nodes string   // 服务节点，多个节点用“|”链接
+	Nodes []string // 服务节点，多个节点用“|”链接
 	Auth  struct { // 身份鉴权
 		Username string // 用户名
 		Password string // 密码
@@ -23,12 +22,11 @@ type Client struct {
 // Instance 客户端链接实例化
 func Instance(conf ElastiConfig) (c *Client, err error) {
 	// 将节点字符串切割为数组
-	nodes := normal.SplitAndTrim(conf.Nodes, "|")
 	var client *es7.Client
 	switch conf.Version {
 	case 7:
 		client, err = es7.NewClient(
-			es7.SetURL(nodes...),
+			es7.SetURL(conf.Nodes...),
 			es7.SetBasicAuth(conf.Auth.Username, conf.Auth.Password),
 			es7.SetScheme(conf.DefaultProtocol),
 			es7.SetHealthcheck(conf.HealthCheck),
