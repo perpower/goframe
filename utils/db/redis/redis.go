@@ -3,7 +3,6 @@
 package redis
 
 import (
-	"sync"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -27,49 +26,43 @@ type Client struct {
 }
 
 var (
-	once               sync.Once
 	defaultFlushdbMode = "SYNC" // FLUSHDB 默认清空模式
 	defaultCursor      = 0      // SCAN默认起始游标
 	defaultScanNum     = 10     // 单次scan迭代数量
 )
 
 // 返回指定name的客户端单例对象
-func Instance(config Config) *Client {
+func Instance(config Config) Client {
 	redisConfig := SetConfig(config)
-	c := &Client{
+	c := Client{
 		config: &redisConfig,
 	}
-	once.Do(func() {
-		pool := &redis.Pool{
-			MaxIdle:     redisConfig.MaxIdle,
-			MaxActive:   redisConfig.MaxActive,
-			IdleTimeout: time.Duration(redisConfig.IdleTimeout) * time.Second,
-			Dial: func() (redis.Conn, error) {
-				return redis.Dial(
-					"tcp",
-					redisConfig.Hostname+":"+redisConfig.Port,
-					redis.DialDatabase(redisConfig.Database),
-					redis.DialPassword(redisConfig.Password),
-					redis.DialUseTLS(redisConfig.UseTLS),
-				)
-			},
-		}
 
-		//用完了就关闭这个链接
-		defer pool.Close()
+	pool := &redis.Pool{
+		MaxIdle:     redisConfig.MaxIdle,
+		MaxActive:   redisConfig.MaxActive,
+		IdleTimeout: time.Duration(redisConfig.IdleTimeout) * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial(
+				"tcp",
+				redisConfig.Hostname+":"+redisConfig.Port,
+				redis.DialDatabase(redisConfig.Database),
+				redis.DialPassword(redisConfig.Password),
+				redis.DialUseTLS(redisConfig.UseTLS),
+			)
+		},
+	}
 
-		//从pool连接池里取出一个链接
-		conn := pool.Get()
+	//用完了就关闭这个链接
+	defer pool.Close()
 
-		c.conn = conn
-		auth(c)
-		initGroup(c, conn)
-	})
-	return c
-}
+	//从pool连接池里取出一个链接
+	conn := pool.Get()
 
-// 初始化
-func initGroup(c *Client, conn redis.Conn) *Client {
+	c.conn = conn
+
+	auth(c) // 身份校验
+
 	c.Db = &Rdb{
 		conn: conn,
 	}
@@ -111,7 +104,7 @@ func initGroup(c *Client, conn redis.Conn) *Client {
 }
 
 // 身份校验
-func auth(c *Client) {
+func auth(c Client) {
 	//链接redis服务，进行身份验证
 	if c.config.Username != "" {
 		_, err := c.conn.Do("AUTH", c.config.Username, c.config.Password)
@@ -127,6 +120,6 @@ func auth(c *Client) {
 }
 
 // 通用Do方法保留
-func (c *Client) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
+func (c Client) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
 	return c.conn.Do(commandName, args...)
 }

@@ -14,7 +14,7 @@ import (
 func SortMap(params map[string]any) map[string]any {
 	newMap := make(map[string]any)
 	keys := make([]string, 0, len(params))
-	for k, _ := range params {
+	for k := range params {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
@@ -65,16 +65,19 @@ func InArray(element string, arr []string) bool {
 	return false
 }
 
+// string 转换 bytes
 func String2Bytes(s string) []byte {
 	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	bh := reflect.SliceHeader{
-		Data: sh.Data,
-		Len:  sh.Len,
-		Cap:  sh.Len,
-	}
-	return *(*[]byte)(unsafe.Pointer(&bh))
+
+	var bh []byte
+	pbytes := (*reflect.SliceHeader)(unsafe.Pointer(&bh))
+	pbytes.Data = sh.Data
+	pbytes.Len = sh.Len
+	pbytes.Cap = sh.Len
+	return bh
 }
 
+// bytes 转换 string
 func Bytes2String(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
