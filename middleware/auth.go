@@ -1,17 +1,14 @@
 package middleware
 
 import (
-	"crypto/aes"
 	"crypto/md5"
 	"encoding/base64"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/funcs/ptime"
-	"github.com/perpower/goframe/utils/crypto"
 	"github.com/perpower/goframe/utils/errors"
 
 	"github.com/gin-gonic/gin"
@@ -58,17 +55,11 @@ func SignHandle(signExpire time.Duration, signKey string) gin.HandlerFunc {
 		signStrmd5 := md5.Sum([]byte(signStr))
 
 		//字符转大写
-		signStr_pre := fmt.Sprintf("%x", signStrmd5)
-		signStr = strings.ToUpper(signStr_pre)
+		signStr = fmt.Sprintf("%X", signStrmd5)
 
-		_decodeStr, _ := base64.StdEncoding.DecodeString(sign)
-		block, _ := aes.NewCipher([]byte(signKey))
-		decSign := normal.SubByte(_decodeStr, block.BlockSize(), 0)
+		encryptStr := base64.StdEncoding.EncodeToString(normal.String2Bytes(signStr))
 
-		iv := normal.SubByte(_decodeStr, 0, block.BlockSize())
-		encryptStr, _ := crypto.AES.Encrypt(crypto.AES{}, signStr, signKey, iv)
-
-		if encryptStr != normal.Bytes2String(decSign) {
+		if encryptStr != sign {
 			c.Abort()
 			c.Error(&errors.ERROR_1002)
 			return

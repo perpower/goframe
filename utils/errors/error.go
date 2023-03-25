@@ -42,7 +42,7 @@ var (
 	ERROR_9006   = OutError{9006, "账户信息异常", emptyStruct}
 )
 
-func (e *OutError) Error() string {
+func (e OutError) Error() string {
 	return e.Msg
 }
 
@@ -51,11 +51,11 @@ func (e *OutError) Error() string {
 // code: int
 // msg: string
 // data: interface{}
-func New(code int, msg string, data interface{}) *OutError {
+func New(code int, msg string, data interface{}) OutError {
 	if data == nil {
 		data = emptyStruct // nil 转空结构体
 	}
-	return &OutError{
+	return OutError{
 		Code: code,
 		Msg:  msg,
 		Data: data,
@@ -68,11 +68,11 @@ func New(code int, msg string, data interface{}) *OutError {
 // msg: string
 // data: interface{}
 // msgArgs: slice interface{}
-func Newf(code int, msg string, data interface{}, msgArgs ...interface{}) *OutError {
+func Newf(code int, msg string, data interface{}, msgArgs ...interface{}) OutError {
 	if data == nil {
 		data = emptyStruct // nil 转空结构体
 	}
-	return &OutError{
+	return OutError{
 		Code: code,
 		Msg:  fmt.Sprintf(msg, msgArgs...),
 		Data: data,
@@ -80,23 +80,23 @@ func Newf(code int, msg string, data interface{}, msgArgs ...interface{}) *OutEr
 }
 
 // GetCode returns the integer number of current error code.
-func (c *OutError) GetCode() int {
+func (c OutError) GetCode() int {
 	return c.Code
 }
 
 // GetMsg returns the brief message for current error code.
-func (c *OutError) GetMsg() string {
+func (c OutError) GetMsg() string {
 	return c.Msg
 }
 
 // GetData returns the detailed information of current error code,
 // which is mainly designed as an extension field for error code.
-func (c *OutError) GetData() interface{} {
+func (c OutError) GetData() interface{} {
 	return c.Data
 }
 
 // GetString returns current error code as a string.
-func (c *OutError) GetString() string {
+func (c OutError) GetString() string {
 	if c.Data != nil {
 		return fmt.Sprintf(`%d:%s %v`, c.Code, c.Msg, c.Data)
 	}

@@ -18,7 +18,7 @@ func ErrorHandle() gin.HandlerFunc {
 		for _, e := range c.Errors {
 			err := e.Err
 			// 若是自定义的错误则将code、msg, data返回
-			if errInfo, ok := err.(*errors.OutError); ok {
+			if errInfo, ok := err.(errors.OutError); ok {
 				c.JSON(http.StatusOK, gin.H{
 					"code": errInfo.Code,
 					"msg":  errInfo.Msg,
@@ -32,7 +32,10 @@ func ErrorHandle() gin.HandlerFunc {
 					"data": err.Error(),
 				})
 			}
-			return // 只要检查到一个错误就返回
+
+			if err != nil {
+				return // 只要检查到一个错误就返回
+			}
 		}
 	}
 }
