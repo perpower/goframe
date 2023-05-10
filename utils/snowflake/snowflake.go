@@ -48,13 +48,13 @@ type Snowflake struct {
 	sequence     int64
 }
 
-var redisClient redis.Client
+var redisClient *redis.Client
 
 // NewSnowflake
 // redisObj： *redis.Client 已经实例化的redis链接对象
 // datacenterid: int64
 // workerid: int64
-func NewSnowflake(redisObj redis.Client, datacenterid, workerid int64) (*Snowflake, error) {
+func NewSnowflake(redisObj *redis.Client, datacenterid, workerid int64) (*Snowflake, error) {
 	redisClient = redisObj
 	if datacenterid < 0 || datacenterid > datacenteridMax {
 		return nil, fmt.Errorf("datacenterid must be between 0 and %d", datacenteridMax-1)

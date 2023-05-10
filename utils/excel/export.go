@@ -15,23 +15,20 @@ const maxCharCount = 26
 // f: *excelize.File
 // fileName: string 文件路径（包含文件名）
 func SaveAsFile(f *excelize.File, fileName string) (err error) {
-	if err = f.SaveAs(fileName); err != nil {
-		fmt.Println("Excel导出错误,errInfo: ", err)
-	}
-
+	err = f.SaveAs(fileName)
 	return err
 }
 
 // SaveAsWeb 保存为Excel流媒体文件
 // fileName: string 文件名
 func SaveAsWeb(f *excelize.File, fileName string, w http.ResponseWriter) {
-	// w.Header().Add("Content-Type", "application/vnd.ms-excel")	// 需要让浏览器识别为excel文件
-	w.Header().Add("Content-Type", "application/octet-stream") // 默认让浏览器下载文件
-	w.Header().Add("Content-Disposition", "attachment; filename="+fileName)
-	w.Header().Add("Content-Transfer-Encoding", "binary")
+	w.Header().Add("Content-Type", "application/vnd.ms-excel") // 需要让浏览器识别为excel文件
+	w.Header().Set("Content-Type", "application/octet-stream") // 默认让浏览器下载文件
+	w.Header().Set("Content-Disposition", "attachment; filename="+fileName)
+	w.Header().Set("Content-Transfer-Encoding", "binary")
 
 	if err := f.Write(w); err != nil {
-		fmt.Println("Excel导出错误,errInfo: ", err)
+		http.Error(w, "导出失败", http.StatusInternalServerError)
 	}
 }
 

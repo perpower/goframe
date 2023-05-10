@@ -28,9 +28,9 @@ type Page struct {
 
 // New 解密游标
 // cursor: string 加密后游标值
-func New(cursor string, pageSize int) (Page, error) {
+func New(cursor string, pageSize int) (*Page, error) {
 	if cursor == "" {
-		return Page{
+		return &Page{
 			CursorValue: "",
 			NextTimeAt:  ptime.TimestampMilli(),
 			PageSize:    pageSize,
@@ -38,15 +38,15 @@ func New(cursor string, pageSize int) (Page, error) {
 	}
 	decodeBytes, err := base.Base64().Decode(cursor)
 	if err != nil {
-		return Page{}, err
+		return &Page{}, err
 	}
 
 	mashRes, err := base.MsgPack().Unmarshal(decodeBytes)
 	if err != nil {
-		return Page{}, err
+		return &Page{}, err
 	}
 
-	return Page{
+	return &Page{
 		CursorValue: convert.String(mashRes["CursorValue"]),
 		NextTimeAt:  convert.Int64(mashRes["NextTimeAt"]),
 		PageSize:    pageSize,
@@ -62,10 +62,10 @@ func (p *Page) Generate(total int64, cursorValue string, nextPage int, dataList 
 	var nextCursor string
 	if p.CursorValue == "" && len(dataList) == 0 {
 		nextCursor = ""
-		dataList = make([]map[string]interface{}, 0) // 将结果置为空切片，以达到返回结果为“[]”的目的
+		dataList = []map[string]interface{}{} // 将结果置为空切片，以达到返回结果为“[]”的目的
 	} else {
 		if len(dataList) == 0 { // 如果查询结果集是空，则继续使用上一次游标值
-			dataList = make([]map[string]interface{}, 0) // 将结果置为空切片，以达到返回结果为“[]”的目的
+			dataList = []map[string]interface{}{} // 将结果置为空切片，以达到返回结果为“[]”的目的
 		}
 		mashBytes, err := base.MsgPack().Marshal(Page{
 			CursorValue: cursorValue,

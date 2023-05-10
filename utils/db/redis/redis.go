@@ -32,9 +32,9 @@ var (
 )
 
 // 返回指定name的客户端单例对象
-func Instance(config Config) Client {
+func Instance(config Config) *Client {
 	redisConfig := SetConfig(config)
-	c := Client{
+	c := &Client{
 		config: &redisConfig,
 	}
 
@@ -104,7 +104,7 @@ func Instance(config Config) Client {
 }
 
 // 身份校验
-func auth(c Client) {
+func auth(c *Client) {
 	//链接redis服务，进行身份验证
 	if c.config.Username != "" {
 		_, err := c.conn.Do("AUTH", c.config.Username, c.config.Password)
@@ -120,6 +120,6 @@ func auth(c Client) {
 }
 
 // 通用Do方法保留
-func (c Client) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
+func (c *Client) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
 	return c.conn.Do(commandName, args...)
 }

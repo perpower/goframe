@@ -58,7 +58,6 @@ func newEncoderConfig(levelEncoder zapcore.LevelEncoder) zapcore.EncoderConfig {
 		TimeKey:        "Time",
 		LevelKey:       "Level",
 		NameKey:        "Name",
-		CallerKey:      "Caler",
 		MessageKey:     "Msg",
 		StacktraceKey:  "Stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
