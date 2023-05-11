@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/perpower/goframe/funcs/normal"
-	"github.com/perpower/goframe/utils/errors"
+	"github.com/perpower/goframe/utils/perrors"
 )
 
 var (
@@ -29,7 +29,7 @@ func SetTimeZone(zone string) (err error) {
 	setTimeZoneMu.Lock()
 	defer setTimeZoneMu.Unlock()
 	if setTimeZoneName != "" && !normal.Equal(zone, setTimeZoneName) {
-		return errors.Newf(errors.ERROR_CODE.Code, `process timezone already set using "%s"`, nil, setTimeZoneName)
+		return perrors.Newf(perrors.ERROR_CODE.Code, `process timezone already set using "%s"`, nil, setTimeZoneName)
 	}
 	defer func() {
 		if err == nil {
@@ -45,7 +45,7 @@ func SetTimeZone(zone string) (err error) {
 	// Load zone info from specified name.
 	location, err := time.LoadLocation(zone)
 	if err != nil {
-		err = errors.Newf(errors.ERROR_CODE.Code, `time.LoadLocation failed for zone "%s"`, err, zone)
+		err = perrors.Newf(perrors.ERROR_CODE.Code, `time.LoadLocation failed for zone "%s"`, err, zone)
 		return err
 	}
 
@@ -58,7 +58,7 @@ func SetTimeZone(zone string) (err error) {
 		envValue = location.String()
 	)
 	if err = os.Setenv(envKey, envValue); err != nil {
-		err = errors.Newf(errors.ERROR_CODE.Code, `set environment failed with key "%s", value "%s"`, err, envKey, envValue)
+		err = perrors.Newf(perrors.ERROR_CODE.Code, `set environment failed with key "%s", value "%s"`, err, envKey, envValue)
 	}
 	return
 }
@@ -86,7 +86,7 @@ func (t *Time) getLocationByZoneName(name string) (location *time.Location, err 
 	if location == nil {
 		location, err = time.LoadLocation(name)
 		if err != nil {
-			err = errors.Newf(errors.ERROR_CODE.Code, `time.LoadLocation failed for name "%s"`, err, name)
+			err = perrors.Newf(perrors.ERROR_CODE.Code, `time.LoadLocation failed for name "%s"`, err, name)
 		}
 		if location != nil {
 			zoneMu.Lock()

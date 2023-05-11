@@ -15,6 +15,9 @@ type PageInfo struct {
 // total: int64 记录总数
 // dataList: []map[string]interface{}  查询结果集
 func Generate(total int64, dataList []map[string]interface{}) (RecordsInfo, error) {
+	if len(dataList) == 0 {
+		dataList = []map[string]interface{}{}
+	}
 	pageinfo := PageInfo{
 		Total: total,
 		List:  dataList,

@@ -1,9 +1,10 @@
 module github.com/perpower/goframe
 
-go 1.19
+go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.0
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gogf/gf/v2 v2.3.2
 	github.com/gomodule/redigo v1.8.9
 	github.com/juju/ratelimit v1.0.2
