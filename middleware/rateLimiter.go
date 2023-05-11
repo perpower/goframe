@@ -4,7 +4,7 @@ package middleware
 import (
 	"time"
 
-	"github.com/perpower/goframe/utils/errors"
+	"github.com/perpower/goframe/utils/perrors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
@@ -28,7 +28,7 @@ func RateLimiterHandle(fillInterval time.Duration, cap int64) gin.HandlerFunc {
 		// 如果取不到令牌就中断本次请求返回系统繁忙提示
 		if bucket.TakeAvailable(1) < 1 {
 			c.Abort()
-			c.Error(&errors.ERROR_3054)
+			c.Error(&perrors.ERROR_3054)
 			return
 		}
 		c.Next()
