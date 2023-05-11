@@ -2,8 +2,8 @@
 package middleware
 
 import (
-	"github.com/perpower/goframe/utils/alarm"
-	"github.com/perpower/goframe/utils/mailer"
+	"github.com/perpower/goframe/utils/palarm"
+	"github.com/perpower/goframe/utils/pmailer"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,12 +13,12 @@ import (
 // emailServerConfig: mailer.EmailSererConfig 发件服务配置
 // receivers: []string 告警邮件收件人地址
 // emailTpl: string 邮件模板
-func PanicHandle(appName string, emailServerConfig mailer.EmailSererConfig, receivers []string, emailTpl string) gin.HandlerFunc {
+func PanicHandle(appName string, emailServerConfig pmailer.EmailSererConfig, receivers []string, emailTpl string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
 				//邮件告警通知
-				alarm.Email(c, appName, emailServerConfig, receivers, "./"+emailTpl, err)
+				palarm.Email(c, appName, emailServerConfig, receivers, "./"+emailTpl, err)
 			}
 		}()
 

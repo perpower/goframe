@@ -9,7 +9,7 @@ import (
 
 	"github.com/perpower/goframe/funcs/normal"
 	"github.com/perpower/goframe/funcs/ptime"
-	"github.com/perpower/goframe/utils/errors"
+	"github.com/perpower/goframe/utils/perrors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +36,7 @@ func SignHandle(signExpire time.Duration, signKey string) gin.HandlerFunc {
 		for key, value := range signParams {
 			if value == "" {
 				c.Abort()
-				c.Error(errors.Newf(errors.ERROR_1002.Code, "签名错误，参数 %s 不能为空", nil, key))
+				c.Error(perrors.Newf(perrors.ERROR_1002.Code, "签名错误，参数 %s 不能为空", nil, key))
 				return
 			}
 		}
@@ -44,7 +44,7 @@ func SignHandle(signExpire time.Duration, signKey string) gin.HandlerFunc {
 		//判断签名时效
 		if time.Duration(nowtime-timestamp_int64) > signExpire {
 			c.Abort()
-			c.Error(&errors.ERROR_1001)
+			c.Error(&perrors.ERROR_1001)
 			return
 		}
 
@@ -61,7 +61,7 @@ func SignHandle(signExpire time.Duration, signKey string) gin.HandlerFunc {
 
 		if encryptStr != sign {
 			c.Abort()
-			c.Error(&errors.ERROR_1002)
+			c.Error(&perrors.ERROR_1002)
 			return
 		}
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/perpower/goframe/utils/errors"
+	"github.com/perpower/goframe/utils/perrors"
 )
 
 // ErrorHandle
@@ -18,7 +18,7 @@ func ErrorHandle() gin.HandlerFunc {
 		for _, e := range c.Errors {
 			err := e.Err
 			// 若是自定义的错误则将code、msg, data返回
-			if errInfo, ok := err.(errors.OutError); ok {
+			if errInfo, ok := err.(perrors.OutError); ok {
 				c.JSON(http.StatusOK, gin.H{
 					"code": errInfo.Code,
 					"msg":  errInfo.Msg,
@@ -27,7 +27,7 @@ func ErrorHandle() gin.HandlerFunc {
 			} else {
 				// 若非自定义错误则返回详细错误信息err.Error()
 				c.JSON(http.StatusOK, gin.H{
-					"code": errors.ERROR_5000.Code,
+					"code": perrors.ERROR_5000.Code,
 					"msg":  "服务器异常",
 					"data": err.Error(),
 				})
