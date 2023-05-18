@@ -25,7 +25,7 @@ type CosConfig struct {
 	PartSize   int64  // 分片上传块大小，单位MB
 	DefaultUrl string // 默认访问地址
 	CdnUrl     string // CDN加速地址
-	Folder     string // 指定虚拟目录
+	Folder     string // 虚拟路径
 }
 
 type Object = cos.Object
@@ -54,7 +54,8 @@ func newClient(conf *CosConfig) *cos.Client {
 // 使用高级上传接口上传对象，上传接口根据用户文件的长度，自动切分数据
 // objectKey: string  文件对象
 // file: *multipart.FileHeader 本地文件
-func (t *tencentCos) Upload(objectKey string, file *multipart.FileHeader) (string, error) {
+// hasHost: bool 返回objectKey时候加上域名地址
+func (t *tencentCos) Upload(objectKey string, file *multipart.FileHeader, hasHost ...bool) (string, error) {
 	client := newClient(t.config)
 
 	filePath, err := dpath.CreateTempPath(file)
@@ -62,7 +63,7 @@ func (t *tencentCos) Upload(objectKey string, file *multipart.FileHeader) (strin
 		return "", err
 	}
 
-	uploadResult, _, err := client.Object.Upload(
+	_, _, err = client.Object.Upload(
 		context.TODO(), objectKey, filePath, &cos.MultiUploadOptions{
 			PartSize: t.config.PartSize,
 		},
@@ -72,21 +73,23 @@ func (t *tencentCos) Upload(objectKey string, file *multipart.FileHeader) (strin
 		return "", err
 	}
 
-	if uploadResult.Location != "" {
+	if len(hasHost) > 0 && hasHost[0] {
 		cdnUrl := t.config.CdnUrl
 		if cdnUrl != "" {
-			return t.config.CdnUrl + "/" + objectKey, nil
+			return t.config.CdnUrl + objectKey, nil
 		}
-		return t.config.DefaultUrl + "/" + objectKey, nil
+		return t.config.DefaultUrl + objectKey, nil
 	} else {
-		return "", nil
+		return objectKey, nil
 	}
+
 }
 
 // 使用简单上传接口
 // objectKey: string  文件对象
 // file: *multipart.FileHeader 本地文件
-func (t *tencentCos) Put(objectKey string, file *multipart.FileHeader) (string, error) {
+// hasHost: bool 返回objectKey时候加上域名地址
+func (t *tencentCos) Put(objectKey string, file *multipart.FileHeader, hasHost ...bool) (string, error) {
 	client := newClient(t.config)
 
 	f, err := file.Open()
@@ -100,12 +103,15 @@ func (t *tencentCos) Put(objectKey string, file *multipart.FileHeader) (string, 
 		return "", err1
 	}
 
-	cdnUrl := t.config.CdnUrl
-	if cdnUrl != "" {
-		return t.config.CdnUrl + "/" + objectKey, nil
+	if len(hasHost) > 0 && hasHost[0] {
+		cdnUrl := t.config.CdnUrl
+		if cdnUrl != "" {
+			return t.config.CdnUrl + objectKey, nil
+		}
+		return t.config.DefaultUrl + objectKey, nil
+	} else {
+		return objectKey, nil
 	}
-	return t.config.DefaultUrl + "/" + objectKey, nil
-
 }
 
 // Delete 删除文件对象

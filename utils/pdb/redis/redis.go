@@ -45,7 +45,7 @@ func Instance(config Config) *Client {
 		Dial: func() (redis.Conn, error) {
 			return redis.Dial(
 				"tcp",
-				redisConfig.Hostname+":"+redisConfig.Port,
+				redisConfig.Address,
 				redis.DialDatabase(redisConfig.Database),
 				redis.DialPassword(redisConfig.Password),
 				redis.DialUseTLS(redisConfig.UseTLS),
