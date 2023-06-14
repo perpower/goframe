@@ -7,6 +7,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
+
+	"github.com/perpower/goframe/funcs/normal"
 )
 
 var Unzip = gunzip{}
@@ -15,16 +18,18 @@ type gunzip struct{}
 
 // 文件信息
 type FileInfo struct {
-	FileName string // 文件名
-	Size     int64  // 文件大小
-	Isdir    bool   // 是否文件夹
+	FileName string     // 文件名
+	Ext      string     // 扩展名
+	Size     int64      // 文件大小
+	Isdir    bool       // 是否文件夹
+	Children []FileInfo // 子级内容
 }
 
 // 读取指定压缩包内的文件
 // filepath: string 文件路径
-func (z *gunzip) ReadContent(filepath string) ([]FileInfo, error) {
+func (z *gunzip) ReadContent(filename string) ([]FileInfo, error) {
 	// 打开一个zip格式文件
-	r, err := zip.OpenReader(filepath)
+	r, err := zip.OpenReader(filename)
 	if err != nil {
 		return []FileInfo{}, err
 	}
@@ -35,16 +40,43 @@ func (z *gunzip) ReadContent(filepath string) ([]FileInfo, error) {
 	}
 
 	// 迭代压缩文件中的文件，打印出文件信息
-	fileInfoList := make([]FileInfo, len(r.File))
+	fileList := make([]FileInfo, len(r.File))
 	for k, f := range r.File {
-		fileInfoList[k] = FileInfo{
-			FileName: f.Name,
+		fileList[k] = FileInfo{
+			FileName: normal.ConvertToUtf8(f.Name),
+			Ext:      getFileExt(f.Name),
 			Size:     f.FileInfo().Size(),
 			Isdir:    f.FileInfo().IsDir(),
 		}
 	}
 
-	return fileInfoList, nil
+	return fileList, nil
+}
+
+// 判断是否是目录
+func (z *gunzip) IsDir(content []byte) bool {
+	info, err := os.Stat(string(content))
+	if os.IsNotExist(err) {
+		// path does not exist
+		return false
+	}
+	return info.IsDir()
+}
+
+// 判断文件是否是zip文件
+func (z *gunzip) IsZip(fileName string) bool {
+	ext := filepath.Ext(fileName)
+	return ext == ".zip" || ext == ".ZIP"
+}
+
+// 获取文件扩展名
+// fileName: string 文件名称
+func getFileExt(fileName string) (ext string) {
+	parts := strings.Split(fileName, ".")
+	if len(parts) > 1 {
+		ext = parts[len(parts)-1]
+	}
+	return
 }
 
 // 解压缩zip文件到指定目录

@@ -5,10 +5,9 @@ import (
 )
 
 type Config struct {
-	Hostname    string // 主机地址
+	Address     string // 地址 ip:port
 	Username    string // redis6.0版本以上开始提供Redis ACL,用户名+密码一起使用
 	Password    string // 密码
-	Port        string // 端口
 	Database    int    // 数据库
 	UseTLS      bool   // 是否启用tls
 	MaxIdle     int    // 允许闲置的最大连接数(0表示不限制)
@@ -17,9 +16,8 @@ type Config struct {
 }
 
 var (
-	defaultPort        = "6379" // 默认端口
-	defaultDatabase    = 0      // 默认数据库
-	defaultUseTLS      = false  // 默认是否使用TLS
+	defaultDatabase    = 0     // 默认数据库
+	defaultUseTLS      = false // 默认是否使用TLS
 	defaultMaxIdle     = 10
 	defaultMaxActive   = 100
 	defaultIdleTimeout = 10
@@ -27,11 +25,6 @@ var (
 
 func SetConfig(conf Config) Config {
 	cnf := reflect.TypeOf(conf)
-	if _, ok := cnf.FieldByName("Port"); ok {
-		if conf.Port == "" {
-			conf.Port = defaultPort
-		}
-	}
 
 	if _, ok := cnf.FieldByName("Database"); !ok {
 		conf.Database = defaultDatabase
