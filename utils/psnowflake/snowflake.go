@@ -77,14 +77,19 @@ func getMilliStamp() int64 {
 }
 
 // Generate 生成一个唯一ID
+// prefix: string   key前缀，用于区分不同场景用途的发号
 // return: string
-func (s *Snowflake) Generate() (string, error) {
-	exit, _ := redisClient.Db.Exists([]string{redisPre + ":idsList"})
+func (s *Snowflake) Generate(prefix ...string) (string, error) {
+	keyName := redisPre + ":idsList"
+	if len(prefix) > 0 {
+		keyName = redisPre + ":" + prefix[0] + "idsList"
+	}
+	exit, _ := redisClient.Db.Exists([]string{keyName})
 	if exit == 0 {
-		s.Produce(onceNums)
+		s.Produce(onceNums, prefix...)
 	}
 
-	res, err := redisClient.Zset.ZpopMin(redisPre+":idsList", 1)
+	res, err := redisClient.Zset.ZpopMin(keyName, 1)
 	if err != nil || len(res) == 0 {
 		return "", err
 	}
@@ -94,17 +99,22 @@ func (s *Snowflake) Generate() (string, error) {
 
 // GenerateBatch 批量生成指定数量的ID
 // nums: int 数量
+// prefix: string key前缀，用于区分不同场景用途的发号
 // return: []string 返回ID数组
-func (s *Snowflake) GenerateBatch(nums int) (arr []string, err error) {
-	count, err := redisClient.Zset.Zcard(redisPre + ":idsList")
+func (s *Snowflake) GenerateBatch(nums int, prefix ...string) (arr []string, err error) {
+	keyName := redisPre + ":idsList"
+	if len(prefix) > 0 {
+		keyName = redisPre + ":" + prefix[0] + "idsList"
+	}
+	count, err := redisClient.Zset.Zcard(keyName)
 	if err != nil {
 		return []string{}, err
 	}
 	if (count <= (recreatePercent*onceNums)/100) || (count < nums) {
-		s.Produce(nums)
+		s.Produce(nums, prefix...)
 	}
 
-	res, err := redisClient.Zset.ZpopMin(redisPre+":idsList", nums)
+	res, err := redisClient.Zset.ZpopMin(keyName, nums)
 	if err != nil || len(res) == 0 {
 		return []string{}, err
 	}
@@ -116,11 +126,18 @@ func (s *Snowflake) GenerateBatch(nums int) (arr []string, err error) {
 }
 
 // Produce 批量预生成ID，并将结果存储到redis中
+// nums: int 生成号的数量
+// prefix: key前缀，用于区分不同场景用途的发号
 // return:
 //
 //	count: 成功写入Redis集合的数量
 //	err: 错误信息
-func (s *Snowflake) Produce(nums int) (int, error) {
+func (s *Snowflake) Produce(nums int, prefix ...string) (int, error) {
+	keyName := redisPre + ":idsList"
+	if len(prefix) > 0 {
+		keyName = redisPre + ":" + prefix[0] + "idsList"
+	}
+
 	if nums <= onceNums { // 如果此次要获取的数量大于设定的onceNums，则直接生成nums数量的ID
 		nums = onceNums
 	}
@@ -155,7 +172,7 @@ func (s *Snowflake) Produce(nums int) (int, error) {
 	}
 
 	// 插入redis有序集合中
-	count, err := redisClient.Zset.Zadd(redisPre+":idsList", scoreElements, "", "", false)
+	count, err := redisClient.Zset.Zadd(keyName, scoreElements, "", "", false)
 
 	s.Unlock()
 	return count, err
