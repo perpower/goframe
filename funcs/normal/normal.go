@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/axgle/mahonia"
 	"github.com/thinkeridea/go-extend/exunicode/exutf8"
 )
 
@@ -137,4 +138,51 @@ func Trim(str string, characterMask ...string) string {
 // merger []byte to single one
 func BytesCombine(pBytes ...[]byte) []byte {
 	return bytes.Join(pBytes, []byte(""))
+}
+
+// 将字符编码转换为utf-8
+func ConvertToUtf8(str string) string {
+	dec := mahonia.NewDecoder("gbk")
+	return dec.ConvertString(str)
+}
+
+// 数组去重--非排序数组
+func RemoveDuplication_map(arr []string) []string {
+	set := make(map[string]struct{}, len(arr))
+	j := 0
+	for _, v := range arr {
+		_, ok := set[v]
+		if ok {
+			continue
+		}
+		set[v] = struct{}{}
+		arr[j] = v
+		j++
+	}
+
+	return arr[:j]
+}
+
+// 数组去重--排序数组
+func RemoveDuplication_sort(arr []string) []string {
+	length := len(arr)
+	if length == 0 {
+		return arr
+	}
+
+	j := 0
+	for i := 1; i < length; i++ {
+		if arr[i] != arr[j] {
+			j++
+			if j < i {
+				swap(arr, i, j)
+			}
+		}
+	}
+
+	return arr[:j+1]
+}
+
+func swap(arr []string, a, b int) {
+	arr[a], arr[b] = arr[b], arr[a]
 }
