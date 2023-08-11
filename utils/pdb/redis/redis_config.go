@@ -19,7 +19,7 @@ var (
 	defaultDatabase    = 0     // 默认数据库
 	defaultUseTLS      = false // 默认是否使用TLS
 	defaultMaxIdle     = 10
-	defaultMaxActive   = 100
+	defaultMaxActive   = 1000
 	defaultIdleTimeout = 10
 )
 
@@ -45,8 +45,6 @@ func SetConfig(conf Config) Config {
 	if _, ok := cnf.FieldByName("IdleTimeout"); !ok {
 		conf.IdleTimeout = defaultIdleTimeout
 	}
-
-	// c.config = &conf
 
 	return conf
 }

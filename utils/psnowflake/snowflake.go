@@ -35,7 +35,7 @@ const (
 	workeridShift     = sequenceBits                                   // 机器id左移位数
 	datacenteridShift = sequenceBits + workeridBits                    // 数据中心id左移位数
 	timestampShift    = sequenceBits + workeridBits + datacenteridBits // 时间戳左移位数
-	onceNums          = 50000                                          //单次预生成ID数量
+	onceNums          = 5000                                           //单次预生成ID数量
 	recreatePercent   = 20                                             //预生成百分比阀值
 	redisPre          = "snowflake"                                    //	redis key 分组标识
 )
