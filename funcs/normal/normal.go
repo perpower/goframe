@@ -66,6 +66,38 @@ func InArray(element string, arr []string) bool {
 	return false
 }
 
+// 判断某个int元素是否在数组内
+func InArrayInt(element int, arr []int) bool {
+	check := make(map[int]struct{})
+
+	for _, value := range arr {
+		check[value] = struct{}{}
+	}
+
+	// 检查元素是否在map
+	if _, ok := check[element]; ok {
+		return true
+	}
+
+	return false
+}
+
+// 判断某个int64元素是否在数组内
+func InArrayInt64(element int64, arr []int64) bool {
+	check := make(map[int64]struct{})
+
+	for _, value := range arr {
+		check[value] = struct{}{}
+	}
+
+	// 检查元素是否在map
+	if _, ok := check[element]; ok {
+		return true
+	}
+
+	return false
+}
+
 // string 转换 bytes
 func String2Bytes(s string) []byte {
 	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
@@ -142,7 +174,7 @@ func BytesCombine(pBytes ...[]byte) []byte {
 
 // 将字符编码转换为utf-8
 func ConvertToUtf8(str string) string {
-	dec := mahonia.NewDecoder("gbk")
+	dec := mahonia.NewDecoder("GBK")
 	return dec.ConvertString(str)
 }
 

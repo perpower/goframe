@@ -150,8 +150,7 @@ func (t *tencentCos) Put(objectKey string, file *multipart.FileHeader, hasHost .
 func (t *tencentCos) Delete(objectKey string) error {
 	client := newClient(t.config)
 
-	fullName := t.config.DefaultUrl + "/" + objectKey
-	_, err := client.Object.Delete(context.TODO(), fullName)
+	_, err := client.Object.Delete(context.TODO(), objectKey)
 	return err
 }
 

@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/axgle/mahonia"
+
 	"github.com/perpower/goframe/funcs/normal"
 )
 
@@ -92,16 +94,17 @@ func (z *gunzip) Unzip(filepath, dstDir string) error {
 	defer reader.Close()
 
 	for _, file := range reader.File {
-		if err := z.unzipFile(file, dstDir); err != nil {
+		fileName := mahonia.NewDecoder("gbk").ConvertString(file.Name)
+		if err := z.unzipFile(file, dstDir, fileName); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (z *gunzip) unzipFile(file *zip.File, dstDir string) error {
+func (z *gunzip) unzipFile(file *zip.File, dstDir, fileName string) error {
 	// create the directory of file
-	filePath := path.Join(dstDir, file.Name)
+	filePath := path.Join(dstDir, fileName)
 	if file.FileInfo().IsDir() {
 		if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
 			return err
