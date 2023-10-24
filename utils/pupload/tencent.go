@@ -24,7 +24,7 @@ type CosConfig struct {
 	Region     string // 指定地域
 	PartSize   int64  // 分片上传块大小，单位MB
 	DefaultUrl string // 默认访问地址
-	CdnUrl     string // CDN加速地址
+	CdnUrl     string // 自定义域名地址
 	Folder     string // 虚拟路径
 }
 
@@ -37,7 +37,11 @@ type tencentCos struct {
 
 // 初始化COS client
 func newClient(conf *CosConfig) *cos.Client {
-	u, _ := url.Parse(conf.DefaultUrl)
+	parseUrl := conf.DefaultUrl
+	if conf.CdnUrl != "" {
+		parseUrl = conf.CdnUrl
+	}
+	u, _ := url.Parse(parseUrl)
 	b := &cos.BaseURL{BucketURL: u}
 	client := cos.NewClient(b, &http.Client{
 		Transport: &cos.AuthorizationTransport{
