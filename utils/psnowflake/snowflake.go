@@ -89,12 +89,12 @@ func (s *Snowflake) Generate(prefix ...string) (string, error) {
 		s.Produce(onceNums, prefix...)
 	}
 
-	res, err := redisClient.Zset.ZpopMin(keyName, 1)
+	res, err := redisClient.Set.Spop(keyName, 1)
 	if err != nil || len(res) == 0 {
 		return "", err
 	}
 
-	return res[0][1], err
+	return res[0], err
 }
 
 // GenerateBatch 批量生成指定数量的ID
@@ -114,14 +114,8 @@ func (s *Snowflake) GenerateBatch(nums int, prefix ...string) (arr []string, err
 		s.Produce(nums, prefix...)
 	}
 
-	res, err := redisClient.Zset.ZpopMin(keyName, nums)
-	if err != nil || len(res) == 0 {
-		return []string{}, err
-	}
+	arr, err = redisClient.Set.Spop(keyName, nums)
 
-	for _, val := range res {
-		arr = append(arr, val[1])
-	}
 	return arr, err
 }
 
@@ -143,7 +137,7 @@ func (s *Snowflake) Produce(nums int, prefix ...string) (int, error) {
 	}
 
 	var i int
-	scoreElements := make([][2]string, 0)
+	scoreElements := make([]string, 0)
 
 	s.Lock()
 	for i = 0; i < nums; i++ {
@@ -168,11 +162,11 @@ func (s *Snowflake) Produce(nums int, prefix ...string) (int, error) {
 		}
 		s.timestamp = now
 		r := convert.String(int64((t)<<timestampShift | (s.datacenterid << datacenteridShift) | (s.workerid << workeridShift) | (s.sequence)))
-		scoreElements = append(scoreElements, [2]string{r, r})
+		scoreElements = append(scoreElements, r)
 	}
 
 	// 插入redis有序集合中
-	count, err := redisClient.Zset.Zadd(keyName, scoreElements, "", "", false)
+	count, err := redisClient.Set.Sadd(keyName, scoreElements)
 
 	s.Unlock()
 	return count, err
